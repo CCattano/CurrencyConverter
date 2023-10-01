@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyConverter.Infrastru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyConverter.Adapters", "Source\Adapters\CurrencyConverter.Adapters\CurrencyConverter.Adapters.csproj", "{47386451-C0CE-4204-A485-CAF91C56EB86}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyConverter.BusinessEntities", "Source\BusinessEntities\CurrencyConverter.BusinessEntities\CurrencyConverter.BusinessEntities.csproj", "{7B602AD4-E311-4CCE-96A2-D6A23FD47B1E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,10 +32,15 @@ Global
 		{47386451-C0CE-4204-A485-CAF91C56EB86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47386451-C0CE-4204-A485-CAF91C56EB86}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47386451-C0CE-4204-A485-CAF91C56EB86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B602AD4-E311-4CCE-96A2-D6A23FD47B1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B602AD4-E311-4CCE-96A2-D6A23FD47B1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B602AD4-E311-4CCE-96A2-D6A23FD47B1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B602AD4-E311-4CCE-96A2-D6A23FD47B1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{15B2A464-B6CA-48EA-B78C-820E51EF4672} = {1DF80E1A-4019-4676-8DC0-187BDEB59B2E}
 		{80444BD1-6B3A-4B88-8D54-C68DDCA7B754} = {0BE6C149-AA17-422C-9B27-D5699C82FF3B}
 		{47386451-C0CE-4204-A485-CAF91C56EB86} = {B22AC84A-C39E-4012-B7E4-AFB77D81BC6D}
+		{7B602AD4-E311-4CCE-96A2-D6A23FD47B1E} = {B22AC84A-C39E-4012-B7E4-AFB77D81BC6D}
 	EndGlobalSection
 EndGlobal

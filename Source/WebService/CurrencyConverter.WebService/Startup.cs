@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Microsoft.OpenApi.Models;
 using Torty.Web.Apps.CurrencyConverter.Adapters.Adapters;
+using Torty.Web.Apps.CurrencyConverter.Infrastructure.Caches;
 using Torty.Web.Apps.CurrencyConverter.Infrastructure.Clients.CurrencyConverter;
 
 namespace Torty.Web.Apps.CurrencyConverter.WebService;
@@ -20,7 +21,15 @@ public class Startup
         #region ADAPTERS
 
         services.AddScoped<ICommandsAdapter, CommandsAdapter>();
+        services.AddScoped<ICurrencyConversionAdapter, CurrencyConversionAdapter>();
+        services.AddScoped<ICountryDetailsAdapter, CountryDetailsAdapter>();
         
+        #endregion
+
+        #region CACHES
+
+        services.AddCountryDetailsCache();
+
         #endregion
 
         #region CLIENTS
