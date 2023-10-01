@@ -12,7 +12,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="AutoMapper" Version="12.0.1" />
+      <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
@@ -25,6 +25,10 @@
       <Reference Include="Microsoft.Extensions.Configuration.Abstractions">
         <HintPath>..\..\..\..\..\..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.20\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
       </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\BusinessEntities\CurrencyConverter.BusinessEntities\CurrencyConverter.BusinessEntities.csproj" />
     </ItemGroup>
 
 </Project>

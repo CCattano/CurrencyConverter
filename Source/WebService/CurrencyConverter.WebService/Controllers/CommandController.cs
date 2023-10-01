@@ -12,9 +12,9 @@ public class CommandController : ControllerBase
     public CommandController(ICommandsAdapter adapter) => _adapter = adapter;
 
     [HttpGet]
-    public async Task<ActionResult> Parse()
+    public async Task<ActionResult> Parse([FromQuery] string command)
     {
-        await _adapter.ParseCommand();
-        return Ok();
+        string response = await _adapter.ParseCommand(command);
+        return Ok(response);
     }
 }
