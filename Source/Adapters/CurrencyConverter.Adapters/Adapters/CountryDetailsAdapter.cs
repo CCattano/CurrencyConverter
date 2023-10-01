@@ -12,16 +12,21 @@ public interface ICountryDetailsAdapter
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    Task<CountryDetailsBE> _GetCountryByNameOrDefault(string name);
-    
+    Task<CountryDetailsBE> GetCountryByNameOrDefault(string name);
+
     /// <summary>
-    /// Returns a List of CountryDetailsBE for all countries that use the currency code specified.
-    /// <br />
-    /// If no countries can be found that use the currency code specified null is returned.
+    /// Returns a CountryDetailsBE for a given 3-character country code if found, otherwise returns null
     /// </summary>
     /// <param name="code"></param>
     /// <returns></returns>
-    Task<List<CountryDetailsBE>> _GetCountriesByCurrencyCodeOrDefault(string code);
+    Task<CountryDetailsBE> GetCountryByCountryCodeOrDefault(string code);
+    
+    /// <summary>
+    /// For a given currency's 3-character code, returns that currency's ascii symbol if found otherwise returns null.
+    /// </summary>
+    /// <param name="code"></param>
+    /// <returns></returns>
+    Task<string> GetCurrencySymbolByCurrencyCodeOrDefault(string code);
 }
 
 /// <inheritdoc cref="ICountryDetailsAdapter"/>
@@ -36,7 +41,7 @@ public class CountryDetailsAdapter : ICountryDetailsAdapter
         _client = client;
     }
 
-    public async Task<CountryDetailsBE> _GetCountryByNameOrDefault(string name)
+    public async Task<CountryDetailsBE> GetCountryByNameOrDefault(string name)
     {
         CountryDetailsBE countryDetails = _cache.GetValueByNameOrDefault(name);
 
@@ -48,18 +53,31 @@ public class CountryDetailsAdapter : ICountryDetailsAdapter
 
         return countryDetails;
     }
-
-    public async Task<List<CountryDetailsBE>> _GetCountriesByCurrencyCodeOrDefault(string code)
+    
+    public async Task<CountryDetailsBE> GetCountryByCountryCodeOrDefault(string code)
     {
-        List<CountryDetailsBE> countryDetails = _cache.GetValuesByCurrencyCodeOrDefault(code);
+        CountryDetailsBE countryDetails = _cache.GetValueByCountryCodeOrDefault(code);
 
         if (countryDetails == null && _cache.IsCacheExpired())
         {
             await _TryRefreshExpiredCache();
-            countryDetails = _cache.GetValuesByCurrencyCodeOrDefault(code);
+            countryDetails = _cache.GetValueByCountryCodeOrDefault(code);
+        }
+
+        return countryDetails;
+    }
+
+    public async Task<string> GetCurrencySymbolByCurrencyCodeOrDefault(string code)
+    {
+        string currencySymbol = _cache.GetCurrencySymbolByCurrencyCodeOrDefault(code);
+
+        if (currencySymbol == null && _cache.IsCacheExpired())
+        {
+            await _TryRefreshExpiredCache();
+            currencySymbol = _cache.GetCurrencySymbolByCurrencyCodeOrDefault(code);
         }
         
-        return countryDetails;
+        return currencySymbol;
     }
 
     private async Task _TryRefreshExpiredCache()

@@ -22,14 +22,22 @@ public interface ICountryDetailsCache
     /// <param name="countryName"></param>
     /// <returns></returns>
     CountryDetailsBE GetValueByNameOrDefault(string countryName);
-    
+
     /// <summary>
-    /// Fetch a value from the cache via country code.
+    /// Fetch a value from the cache via a country's 3-character country code.
+    /// Returns the value if found otherwise null.
+    /// </summary>
+    /// <param name="countryCode"></param>
+    /// <returns></returns>
+    CountryDetailsBE GetValueByCountryCodeOrDefault(string countryCode);
+
+    /// <summary>
+    /// Get a currency's symbol from the cache via the currency's 3-character code.
     /// Returns the value if found otherwise null.
     /// </summary>
     /// <param name="currencyCode"></param>
     /// <returns></returns>
-    List<CountryDetailsBE> GetValuesByCurrencyCodeOrDefault(string currencyCode);
+    string GetCurrencySymbolByCurrencyCodeOrDefault(string currencyCode);
     
     /// <summary>
     /// Returns a bool indicating if the cache has expired and needs rehydrated
@@ -83,12 +91,26 @@ public class CountryDetailsCache : ICountryDetailsCache
         lock (_cacheContentLock)
         {
             countryDetails =
-                _cache.FirstOrDefault(country => country.Name.ToLower().Contains(searchVal));
+                _cache?.FirstOrDefault(country => country.Name.ToLower().Contains(searchVal));
         }
         return countryDetails;
     }
     
-    public List<CountryDetailsBE> GetValuesByCurrencyCodeOrDefault(string currencyCode)
+    public CountryDetailsBE GetValueByCountryCodeOrDefault(string countryCode)
+    {
+        if (_IsExpiredFetch()) return null;
+
+        string searchVal = countryCode.ToLower();
+        CountryDetailsBE countryDetails;
+        lock (_cacheContentLock)
+        {
+            countryDetails =
+                _cache?.FirstOrDefault(country => country.CountryCode.ToLower() == searchVal);
+        }
+        return countryDetails;
+    }
+    
+    public string GetCurrencySymbolByCurrencyCodeOrDefault(string currencyCode)
     {
         if (_IsExpiredFetch()) return null;
 
@@ -96,10 +118,10 @@ public class CountryDetailsCache : ICountryDetailsCache
         List<CountryDetailsBE> countryDetails;
         lock (_cacheContentLock)
         {
-            countryDetails = _cache.Where(country => country.CurrencyCode.ToLower() == searchVal).ToList();
+            countryDetails = _cache?.Where(country => country.CurrencyCode.ToLower() == searchVal).ToList();
         }
 
-        return countryDetails.Count == 0 ? null : countryDetails;
+        return countryDetails?.FirstOrDefault()?.CurrencySymbol;
     }
 
     public bool IsCacheExpired()

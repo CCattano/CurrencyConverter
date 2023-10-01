@@ -54,6 +54,9 @@ public class CurrencyConverter : ICurrencyConverter
         
         // Example value: "{"USD_EUR":0.944598}"
         string responseStr = await response.Content.ReadAsStringAsync();
+
+        if (!responseStr.Contains(':')) return null;
+        
         string ratioStr = responseStr.Split(':')[1][..^1];
         
         decimal? result = decimal.TryParse(ratioStr, out decimal ratio) ? ratio : null;

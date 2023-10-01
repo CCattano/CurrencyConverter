@@ -1,5 +1,4 @@
-﻿using Torty.Web.Apps.CurrencyConverter.BusinessEntities.Countries;
-using Torty.Web.Apps.CurrencyConverter.Infrastructure.Clients.CurrencyConverter;
+﻿using Torty.Web.Apps.CurrencyConverter.Infrastructure.Clients.CurrencyConverter;
 
 namespace Torty.Web.Apps.CurrencyConverter.Adapters.Adapters;
 
@@ -32,31 +31,14 @@ public class CurrencyConversionAdapter : ICurrencyConversionAdapter
                    " currency code or the online conversion service may be down temporarily. Try again in" +
                    " a few minutes. If the issue persists and you feel you used the !converter" +
                    " command correctly, send the command text you used to Torty to look into.";
-            
+
         decimal conversionResult =
             decimal.Round(amountNum * conversionRatio.Value, 2, MidpointRounding.AwayFromZero);
 
-        List<CountryDetailsBE> countriesUsingFromCurrency = 
-            await _countryDetailsAdapter._GetCountriesByCurrencyCodeOrDefault(from);
-        List<CountryDetailsBE> countriesUsingToCurrency =
-            await _countryDetailsAdapter._GetCountriesByCurrencyCodeOrDefault(to);
-        
-        string response = $"FROM_SYMBOL{amount} {from} is TO_SYMBOL{conversionResult} {to}";
+        string fromSymbol = await _countryDetailsAdapter.GetCurrencySymbolByCurrencyCodeOrDefault(from) ?? string.Empty;
+        string toSymbol = await _countryDetailsAdapter.GetCurrencySymbolByCurrencyCodeOrDefault(to) ?? string.Empty;
 
-        if (countriesUsingFromCurrency == null || countriesUsingToCurrency == null)
-        {
-            response = response
-                .Replace("FROM_SYMBOL", string.Empty)
-                .Replace("TO_SYMBOL", string.Empty);
-        }
-        else
-        {
-            string fromSymbol = countriesUsingFromCurrency.First().CurrencySymbol;
-            string toSymbol = countriesUsingToCurrency.First().CurrencySymbol;
-            response = response
-                .Replace("FROM_SYMBOL", fromSymbol)
-                .Replace("TO_SYMBOL", toSymbol);
-        }
+        string response = $"{fromSymbol}{amount} {from} is {toSymbol}{conversionResult} {to}";
 
         return response;
     }

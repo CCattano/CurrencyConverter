@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Torty.Web.Apps.CurrencyConverter.BusinessEntities.Countries;
 
 namespace Torty.Web.Apps.CurrencyConverter.Adapters.Adapters;
 
@@ -10,6 +11,7 @@ public interface ICommandsAdapter
 public class CommandsAdapter : ICommandsAdapter
 {
     private readonly ICurrencyConversionAdapter _conversionAdapter;
+    private readonly ICountryDetailsAdapter _countryDetailsAdapter;
 
     private struct HelpMessages
     {
@@ -28,27 +30,29 @@ public class CommandsAdapter : ICommandsAdapter
             " Examples: !converter code USA - !converter code United States - !converter code USA,Ireland - !converter code United States,IRL";
     }
 
-    public CommandsAdapter(ICurrencyConversionAdapter conversionAdapter)
+    public CommandsAdapter(ICurrencyConversionAdapter conversionAdapter, ICountryDetailsAdapter countryDetailsAdapter)
     {
         _conversionAdapter = conversionAdapter;
+        _countryDetailsAdapter = countryDetailsAdapter;
     }
 
     public async Task<string> ParseCommand(string command)
     {
-        string validationMsg = TryGetActionFromCommand(command, out Actions? action);
+        string validationMsg = _TryGetActionFromCommand(command, out Actions? action);
         if (!string.IsNullOrEmpty(validationMsg))
             return validationMsg;
 
         string response = action! switch
         {
             Actions.Help => HelpMessages.HelpMessage,
-            Actions.Convert => await ProcessConvertAction(command)
+            Actions.Convert => await _ProcessConvertAction(command),
+            Actions.Code => await _ProcessCodeAction(command)
         };
 
         return response;
     }
 
-    private async Task<string> ProcessConvertAction(string command)
+    private async Task<string> _ProcessConvertAction(string command)
     {
         string actionDetails = command["convert ".Length..];
 
@@ -73,14 +77,44 @@ public class CommandsAdapter : ICommandsAdapter
                " convert help\" to learn how to use the convert action.";
     }
 
-    private static string TryGetActionFromCommand(string command, out Actions? action)
+    private async Task<string> _ProcessCodeAction(string command)
+    {
+        string actionDetails = command["code ".Length..];
+
+        if (actionDetails.ToLower() == "help")
+            return HelpMessages.CodeHelpMessage;
+
+        List<string> namesOrCodes = actionDetails.Split(',').Select(name => name.Trim()).ToList();
+
+        Regex countryCodeRegex = new(@"^[a-zA-Z]{3}$");
+        List<string> resultPerSearch = new();
+        foreach (string nameOrCode in namesOrCodes)
+        {
+            bool isCountryCode = countryCodeRegex.IsMatch(nameOrCode);
+            CountryDetailsBE countryDetails = isCountryCode
+                ? await _countryDetailsAdapter.GetCountryByCountryCodeOrDefault(nameOrCode)
+                : await _countryDetailsAdapter.GetCountryByNameOrDefault(nameOrCode);
+
+            string result = $"Search Term: {nameOrCode} - ";
+            if (countryDetails == null)
+                result += "Could not determine intended country.";
+            else
+                result += $"Country Identified: {countryDetails.Name} - Currency Code: {countryDetails.CurrencyCode}.";
+            resultPerSearch.Add(result);
+        }
+
+        string response = string.Join(' ', resultPerSearch);
+        return response;
+    }
+
+    private static string _TryGetActionFromCommand(string command, out Actions? action)
     {
         const string defaultErrMsg =
             @"Could not identify the action to perform. Use the ""help"" (!converter help) action" +
             " to learn how !converter works. If this issue persists, bug Torty to look into it.";
         
         action = null;
-        command = command.Trim().ToLower();
+        command = command?.Trim().ToLower() ?? string.Empty;
 
         if (!command.Contains(' ') && command != "help")
             return defaultErrMsg;
